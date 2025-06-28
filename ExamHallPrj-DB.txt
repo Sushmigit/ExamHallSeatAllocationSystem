@@ -1,0 +1,183 @@
+CREATE DATABASE examhallseatprj;
+use examhallseatprj;
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(50) NOT NULL,
+  password VARCHAR(100) NOT NULL
+);
+INSERT INTO users (username, password) VALUES ('admin', 'admin123');
+CREATE TABLE admin_login (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+INSERT INTO admin_login (username, password) VALUES ('admin', 'admin123');
+
+
+CREATE TABLE timetable (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    exam_name VARCHAR(100) NOT NULL,
+    subject_name VARCHAR(100) NOT NULL,
+    department VARCHAR(50) NOT NULL,
+    semester VARCHAR(10) NOT NULL,
+    exam_date DATE NOT NULL,
+    session VARCHAR(20) NOT NULL
+);
+CREATE TABLE venue (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    venue_name VARCHAR(100) NOT NULL,
+    room_no VARCHAR(20) NOT NULL,
+    total_seats INT NOT NULL
+);
+CREATE TABLE invigilator (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    department VARCHAR(50) NOT NULL
+);
+use examhallseatprj;
+CREATE TABLE student (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    reg_no VARCHAR(50) NOT NULL UNIQUE,
+    department VARCHAR(50) NOT NULL,
+    semester VARCHAR(10) NOT NULL,
+    subject_enrolled VARCHAR(100) NOT NULL
+);
+
+select * from venue;
+select * from invigilator;
+select * from timetable;
+select * from student;
+alter table venue_allocation add column invigilator varchar(25) not null;
+alter table invigilator_allocation drop column allocated;
+drop table timetable_allocation;
+drop table venue_allocation;
+drop table invigilator_allocation;
+ALTER TABLE timetable ADD allocated TINYINT(1) DEFAULT 0;
+ALTER TABLE venue ADD allocated TINYINT(1) DEFAULT 0;
+ALTER TABLE invigilator ADD allocated TINYINT(1) DEFAULT 0;
+ALTER TABLE student ADD allocated TINYINT(1) DEFAULT 0;
+CREATE TABLE student_allocation (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    timetable_id INT,
+    venue_id INT,
+    seat_no VARCHAR(20),
+    invigilator_name VARCHAR(100),
+
+    FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE,
+    FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON DELETE CASCADE,
+    FOREIGN KEY (venue_id) REFERENCES venue(id) ON DELETE CASCADE
+);
+CREATE TABLE timetable_allocation (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    timetable_id INT,
+    venue_id INT,
+    seats_allocated INT,
+    invigilator VARCHAR(100),
+
+    FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON DELETE CASCADE,
+    FOREIGN KEY (venue_id) REFERENCES venue(id) ON DELETE CASCADE
+);
+CREATE TABLE venue_allocation (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    venue_id INT,
+    timetable_id INT,
+    invigilator VARCHAR(100),
+    seats_allocated INT,
+    seats_available INT,
+
+    FOREIGN KEY (venue_id) REFERENCES venue(id) ON DELETE CASCADE,
+    FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON DELETE CASCADE
+);
+CREATE TABLE invigilator_allocation (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invigilator_id INT,
+    timetable_id INT,
+    venue_id INT,
+
+    FOREIGN KEY (invigilator_id) REFERENCES invigilator(id) ON DELETE CASCADE,
+    FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON DELETE CASCADE,
+    FOREIGN KEY (venue_id) REFERENCES venue(id) ON DELETE CASCADE
+);
+select * from timetable;
+SELECT * FROM timetable WHERE department = 'CSE' AND semester = '3' AND allocated = '0';
+select * from timetable_allocation;
+select * from venue_allocation;
+select * from student_allocation;
+select * from invigilator_allocation;
+select * from timetable_deallocation;
+select * from venue_deallocation;
+select * from student_deallocation;
+select * from invigilator_deallocation;
+CREATE TABLE student_deallocation (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    timetable_id INT,
+    venue_id INT,
+    seat_no VARCHAR(20),
+    invigilator_name VARCHAR(100),
+    FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE,
+    FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON DELETE CASCADE,
+    FOREIGN KEY (venue_id) REFERENCES venue(id) ON DELETE CASCADE
+);
+
+CREATE TABLE timetable_deallocation (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    timetable_id INT,
+    venue_id INT,
+    seats_allocated INT,
+    invigilator VARCHAR(100),
+    FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON DELETE CASCADE,
+    FOREIGN KEY (venue_id) REFERENCES venue(id) ON DELETE CASCADE
+);
+
+CREATE TABLE venue_deallocation (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    venue_id INT,
+    timetable_id INT,
+    invigilator VARCHAR(100),
+    seats_allocated INT,
+    seats_available INT,
+    FOREIGN KEY (venue_id) REFERENCES venue(id) ON DELETE CASCADE,
+    FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON DELETE CASCADE
+);
+
+CREATE TABLE invigilator_deallocation (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invigilator_id INT,
+    timetable_id INT,
+    venue_id INT,
+    FOREIGN KEY (invigilator_id) REFERENCES invigilator(id) ON DELETE CASCADE,
+    FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON DELETE CASCADE,
+    FOREIGN KEY (venue_id) REFERENCES venue(id) ON DELETE CASCADE
+);
+select * from venue;
+delete from venue where id = 1;
+select * from venue_allocation;
+select * from student;
+select * from student_allocation;
+select * from timetable;
+SELECT va.venue_id, va.seats_allocated, va.seats_available, va.invigilator, 
+                    v.venue_name, v.room_no 
+                    FROM venue_allocation va 
+                    JOIN venue v ON va.venue_id = v.venue_id 
+                    WHERE va.seats_available > 0;
+use examhallseatprj;
+select * from invigilator_allocation;
+select * from student;
+select * from timetable_allocation;
+
+CREATE TABLE student_login (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(50) NOT NULL
+);
+
+-- Insert 5 demo users
+INSERT INTO student_login (username, password) VALUES 
+('sushmi01', 'pass123'),
+('rahul02', 'abc123'),
+('megha03', 'pwd321'),
+('barath04', 'barath'),
+('anu05', 'anuanu');
